@@ -18,6 +18,6 @@ defmodule Magic.API do
 
   def process_response_body(body) do
     body
-    |> Poison.decode!()
+    |> Jason.decode!()
   end
 end

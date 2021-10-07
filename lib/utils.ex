@@ -7,7 +7,7 @@ defmodule Magic.Utils do
 
   def recover_pubkey(message, signature) do
     <<bin_signature::binary-size(64), version::size(8)>> = hex_to_bin(signature)
-    hash = ExKeccak.hash_256(Magic.Utils.prefix_message(message))
+    hash = message |> prefix_message() |> ETH.Utils.keccak256()
 
     # Version of signature should be 27 or 28, but 0 and 1 are also possible versions
     # which can show up in Ledger hardwallet signings
@@ -18,8 +18,7 @@ defmodule Magic.Utils do
         version
       end
 
-    {:ok, pubkey} = ExSecp256k1.recover_compact(hash, bin_signature, version - @v_base)
-    pubkey
+    ETH.Utils.secp256k1_recover_compact(hash, bin_signature, version - @v_base)
   end
 
   def pubkey_to_address(pubkey) do

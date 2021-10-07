@@ -135,7 +135,7 @@ defmodule TokenTest do
 
   defp make_token(claim, private_key) do
     message = Jason.encode!(claim)
-    hash = ExKeccak.hash_256(Magic.Utils.prefix_message(message))
+    hash = message |> Magic.Utils.prefix_message() |> ETH.Utils.keccak256()
     [signature: signature, recovery: recovery] = ETH.Utils.secp256k1_signature(hash, private_key)
     proof = <<signature::binary, recovery + 27::size(8)>> |> Magic.Utils.bin_to_hex()
     token = [proof, message] |> Jason.encode!() |> Base.encode64()
