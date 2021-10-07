@@ -3,10 +3,11 @@
 The Magic Admin Elixir SDK provides convenient ways for developers to interact with
 Magic API endpoints and an array of utilities to handle DID Token.
 
+Additional documentation can be found at [https://hexdocs.pm/magic_admin](https://hexdocs.pm/magic_admin).
+
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `magic_admin` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `magic_admin` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -16,13 +17,23 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/magic_admin](https://hexdocs.pm/magic_admin).
+## Configuration
+
+To make API calls, it is necessary to configure your Magic secret key.
+
+```elixir
+use Mix.Config
+
+config :magic, secret_key: System.get_env("MAGIC_SECRET")
+# OR
+config :magic, secret_key: "sk_live_XXXXXXXXXXX"
+```
 
 ## Usage
 
-### Validating Tokens
+### Tokens
+
+#### Validate Tokens
 
 The `Token.validate!/1` function returns `true` if the token is valid, or raises a
 `DIDTokenError` with a message describing why the token is invalid.
@@ -30,6 +41,8 @@ The `Token.validate!/1` function returns `true` if the token is valid, or raises
 ```elixir
 true = Magic.Token.validate!(did_token)
 ```
+
+#### Decode Tokens
 
 The `Token.decode!/1` function returns a map of `proof`, `claim` and `message`, or raises
 a `DIDTokenError` if it is malformed. `claim` is the parsed map of claims made by the decoded
@@ -40,6 +53,8 @@ encoded version of `claim`.
 %{proof: proof, claim: claim, message: message} = Magic.Token.decode!(did_token)
 ```
 
+#### Get Token Attributes
+
 The `Token` module also includes a couple of utility functions for accessing the issuer
 and public address attributes of a token.
 
@@ -48,9 +63,28 @@ issuer = Magic.Token.get_issuer(did_token)
 address = Magic.Token.get_public_address(did_token)
 ```
 
-### Accessing Users
+### Users
 
-TODO
+#### Get User Metadata
+
+Metadata for a user can be retrieved by supplying issuer, public key, or the full DID Token:
+
+```elixir
+Magic.User.get_metadata_by_issuer!(issuer)
+Magic.User.get_metadata_by_public_address!(public_address)
+Magic.User.get_metadata_by_token!(did_token)
+# => %{email: "fake@example.com", issuer: "did:ethr:0x00000000000000000000000000000", public_address: "0x00000000000000000000000000000000"}
+ ```
+
+#### Log Out a User
+
+Logs a user out of all Magic SDK sessions by the supplied issuer, public address, or the full DID Token:
+
+```elixir
+Magic.User.logout_by_issuer!(issuer)
+Magic.User.logout_by_public_address!(public_address)
+Magic.User.logout_by_token!(did_token)
+ ```
 
 ## Attribution
 

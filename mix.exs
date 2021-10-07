@@ -10,6 +10,7 @@ defmodule Magic.MixProject do
       description: description(),
       package: package(),
       deps: deps(),
+      docs: docs(),
       source_url: "https://github.com/allenan/magic-admin-elixir",
       homepage_url: "https://github.com/allenan/magic-admin-elixir"
     ]
@@ -27,7 +28,8 @@ defmodule Magic.MixProject do
     [
       {:ex_doc, "~> 0.24", only: :dev, runtime: false},
       {:jason, "~> 1.2"},
-      {:eth, "~> 0.6.4"}
+      {:eth, "~> 0.6.4"},
+      {:httpoison, "~> 1.8"}
     ]
   end
 
@@ -40,6 +42,13 @@ defmodule Magic.MixProject do
       name: "magic_admin",
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/allenan/magic-admin-elixir"}
+    ]
+  end
+
+  defp docs() do
+    [
+      extras: ["README.md"],
+      main: "readme"
     ]
   end
 end

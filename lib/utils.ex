@@ -11,9 +11,12 @@ defmodule Magic.Utils do
 
     # Version of signature should be 27 or 28, but 0 and 1 are also possible versions
     # which can show up in Ledger hardwallet signings
-    if version < 27 do
-      version = version + 27
-    end
+    version =
+      if version < 27 do
+        version + 27
+      else
+        version
+      end
 
     {:ok, pubkey} = ExSecp256k1.recover_compact(hash, bin_signature, version - @v_base)
     pubkey
