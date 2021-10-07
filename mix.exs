@@ -3,7 +3,7 @@ defmodule Magic.MixProject do
 
   def project do
     [
-      app: :magic,
+      app: :magic_admin,
       version: "0.3.0",
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,

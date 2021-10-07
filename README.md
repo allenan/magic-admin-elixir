@@ -24,9 +24,9 @@ To make API calls, it is necessary to configure your Magic secret key.
 ```elixir
 use Mix.Config
 
-config :magic, secret_key: System.get_env("MAGIC_SECRET")
+config :magic_admin, secret_key: System.get_env("MAGIC_SECRET")
 # OR
-config :magic, secret_key: "sk_live_XXXXXXXXXXX"
+config :magic_admin, secret_key: "sk_live_XXXXXXXXXXX"
 ```
 
 ## Usage
