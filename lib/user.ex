@@ -12,56 +12,52 @@ defmodule Magic.User do
   @doc """
   Retrieves information about the user by the supplied issuer
   """
-  @spec get_metadata_by_issuer!(issuer) :: user
-  def get_metadata_by_issuer!(issuer) do
-    %HTTPoison.Response{body: body} =
-      Magic.API.get!("/v1/admin/auth/user/get", nil, params: [issuer: issuer])
-
-    body["data"]
-    |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+  @spec get_metadata_by_issuer(issuer) :: {:ok, user} | {:error, String.t()}
+  def get_metadata_by_issuer(issuer) do
+    Magic.API.get_user(issuer)
   end
 
   @doc """
   Retrieves information about the user by the supplied public address
   """
-  @spec get_metadata_by_public_address!(public_address) :: user
-  def get_metadata_by_public_address!(public_address) do
+  @spec get_metadata_by_public_address(public_address) :: {:ok, user} | {:error, String.t()}
+  def get_metadata_by_public_address(public_address) do
     issuer = Token.construct_issuer_with_public_address(public_address)
-    get_metadata_by_issuer!(issuer)
+    get_metadata_by_issuer(issuer)
   end
 
   @doc """
   Retrieves information about the user by the supplied DID Token
   """
-  @spec get_metadata_by_token!(did_token) :: user
-  def get_metadata_by_token!(did_token) do
+  @spec get_metadata_by_token(did_token) :: {:ok, user} | {:error, String.t()}
+  def get_metadata_by_token(did_token) do
     issuer = Token.get_issuer(did_token)
-    get_metadata_by_issuer!(issuer)
+    get_metadata_by_issuer(issuer)
   end
 
   @doc """
   Logs a user out of all Magic SDK sessions by the supplied issuer
   """
-  @spec logout_by_issuer!(issuer) :: HTTPoison.Response.t()
-  def logout_by_issuer!(issuer) do
-    Magic.API.post!("/v2/admin/auth/user/logout", nil, params: [issuer: issuer])
+  @spec logout_by_issuer(issuer) :: {:ok, %{}} | {:error, String.t()}
+  def logout_by_issuer(issuer) do
+    Magic.API.logout_user(issuer)
   end
 
   @doc """
   Logs a user out of all Magic SDK sessions by the supplied public address
   """
-  @spec logout_by_public_address!(public_address) :: HTTPoison.Response.t()
-  def logout_by_public_address!(public_address) do
+  @spec logout_by_public_address(public_address) :: {:ok, %{}} | {:error, String.t()}
+  def logout_by_public_address(public_address) do
     issuer = Token.construct_issuer_with_public_address(public_address)
-    logout_by_issuer!(issuer)
+    logout_by_issuer(issuer)
   end
 
   @doc """
   Logs a user out of all Magic SDK sessions by the supplied DID Token
   """
-  @spec logout_by_token!(did_token) :: HTTPoison.Response.t()
-  def logout_by_token!(did_token) do
+  @spec logout_by_token(did_token) :: {:ok, %{}} | {:error, String.t()}
+  def logout_by_token(did_token) do
     issuer = Token.get_issuer(did_token)
-    logout_by_issuer!(issuer)
+    logout_by_issuer(issuer)
   end
 end

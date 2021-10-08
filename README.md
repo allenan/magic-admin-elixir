@@ -70,10 +70,10 @@ address = Magic.Token.get_public_address(did_token)
 Metadata for a user can be retrieved by supplying issuer, public key, or the full DID Token:
 
 ```elixir
-Magic.User.get_metadata_by_issuer!(issuer)
-Magic.User.get_metadata_by_public_address!(public_address)
-Magic.User.get_metadata_by_token!(did_token)
-# => %{email: "fake@example.com", issuer: "did:ethr:0x00000000000000000000000000000", public_address: "0x00000000000000000000000000000000"}
+Magic.User.get_metadata_by_issuer(issuer)
+Magic.User.get_metadata_by_public_address(public_address)
+Magic.User.get_metadata_by_token(did_token)
+# => {:ok, %{email: "fake@example.com", issuer: "did:ethr:0x00000000000000000000000000000", public_address: "0x00000000000000000000000000000000"}}
  ```
 
 #### Log Out a User
@@ -81,9 +81,9 @@ Magic.User.get_metadata_by_token!(did_token)
 Logs a user out of all Magic SDK sessions by the supplied issuer, public address, or the full DID Token:
 
 ```elixir
-Magic.User.logout_by_issuer!(issuer)
-Magic.User.logout_by_public_address!(public_address)
-Magic.User.logout_by_token!(did_token)
+Magic.User.logout_by_issuer(issuer)
+Magic.User.logout_by_public_address(public_address)
+Magic.User.logout_by_token(did_token)
  ```
 
 ## Attribution

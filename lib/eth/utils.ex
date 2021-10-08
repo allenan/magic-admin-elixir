@@ -3,7 +3,7 @@ defmodule ETH.Utils do
 
   # extracted from https://github.com/izelnakri/eth/blob/main/lib/eth/utils.ex
   # to avoid some of the other dependencies of the ETH library
-  
+
   def get_private_key, do: :crypto.strong_rand_bytes(32)
 
   def get_public_key(<<private_key::binary-size(32)>>) do
@@ -71,7 +71,9 @@ defmodule ETH.Utils do
   end
 
   def secp256k1_recover_compact(hash, signature, recovery_id) do
-    {:ok, pubkey} = :libsecp256k1.ecdsa_recover_compact(hash, signature, :uncompressed, recovery_id)
+    {:ok, pubkey} =
+      :libsecp256k1.ecdsa_recover_compact(hash, signature, :uncompressed, recovery_id)
+
     pubkey
   end
 

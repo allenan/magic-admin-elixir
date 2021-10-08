@@ -28,9 +28,10 @@ defmodule Magic.MixProject do
     [
       {:ex_doc, "~> 0.24", only: :dev, runtime: false},
       {:jason, "~> 1.2"},
-      {:httpoison, "~> 1.8"},
       {:ex_sha3, "~> 0.1.1"},
-      {:libsecp256k1, "~> 0.1.10"}
+      {:libsecp256k1, "~> 0.1.10"},
+      {:tesla, "~> 1.4"},
+      {:hackney, "~> 1.17"}
     ]
   end
 
