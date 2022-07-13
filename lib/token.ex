@@ -86,13 +86,10 @@ defmodule Magic.Token do
           | {:error, :malformed_did_token}
   def decode(did_token) do
     try do
-      [proof, message] = Base.decode64!(did_token) |> Jason.decode!()
-      claim = Jason.decode!(message)
-      validate_claim_fields!(claim)
-      {:ok, %{proof: proof, claim: claim, message: message}}
+      decoded = decode!(did_token)
+      {:ok, decoded}
     rescue
-      ArgumentError -> {:error, :malformed_did_token}
-      Jason.DecodeError -> {:error, :malformed_did_token}
+      DIDTokenError -> {:error, :malformed_did_token}
     end
   end
 
