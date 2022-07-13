@@ -75,6 +75,28 @@ defmodule Magic.Token do
   end
 
   @doc """
+    Decodes a DID Token from a Base64 string into a tuple of its individual
+    components: proof and claim. This method allows you decode the DID Token
+    and inspect the token
+    
+    Returns an :ok tuple with a map containing proof, claim and message or an error tuple
+  """
+  @spec decode(did_token) ::
+          {:ok, %{proof: String.t(), claim: claim, message: String.t()}}
+          | {:error, :malformed_did_token}
+  def decode(did_token) do
+    try do
+      [proof, message] = Base.decode64!(did_token) |> Jason.decode!()
+      claim = Jason.decode!(message)
+      validate_claim_fields!(claim)
+      {:ok, %{proof: proof, claim: claim, message: message}}
+    rescue
+      ArgumentError -> {:error, :malformed_did_token}
+      Jason.DecodeError -> {:error, :malformed_did_token}
+    end
+  end
+
+  @doc """
     Parses public_address and extracts issuer
     
     Returns issuer info

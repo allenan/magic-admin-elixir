@@ -53,9 +53,23 @@ defmodule TokenTest do
     assert Token.validate!(did_token) == true
   end
 
-  test "decodes a DID token" do
+  test "decodes a DID token using decode!" do
     %{token: did_token, proof: did_proof, claim: did_claim} = token_fixture()
     %{proof: proof, claim: claim} = Token.decode!(did_token)
+    assert proof == did_proof
+    assert claim["add"] == "fake_add"
+    assert claim["aud"] == "fake_aud"
+    assert claim["ext"] == did_claim["ext"]
+    assert claim["iat"] == did_claim["iat"]
+    assert claim["iss"] == did_claim["iss"]
+    assert claim["nbf"] == did_claim["nbf"]
+    assert claim["sub"] == "fake_sub"
+    assert claim["tid"] == "fake_tid"
+  end
+
+  test "decodes a DID token using decode" do
+    %{token: did_token, proof: did_proof, claim: did_claim} = token_fixture()
+    {:ok, %{proof: proof, claim: claim}} = Token.decode(did_token)
     assert proof == did_proof
     assert claim["add"] == "fake_add"
     assert claim["aud"] == "fake_aud"
@@ -76,10 +90,14 @@ defmodule TokenTest do
     assert Token.get_issuer(did_token) == did_claim["iss"]
   end
 
-  test "raises an error if token is malformed" do
+  test "decode! raises an error if token is malformed" do
     assert_raise DIDTokenError, "DID Token is malformed", fn ->
       Token.decode!("malformed_token")
     end
+  end
+
+  test "decode returns an error tuple if token is malformed" do
+    assert Token.decode("malformed_token") == {:error, :malformed_did_token}
   end
 
   test "raises an error if token is missing fields" do
