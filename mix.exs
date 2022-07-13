@@ -4,7 +4,7 @@ defmodule Magic.MixProject do
   def project do
     [
       app: :magic_admin,
-      version: "0.4.0",
+      version: "0.6.0",
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
       description: description(),
@@ -29,7 +29,7 @@ defmodule Magic.MixProject do
       {:ex_doc, "~> 0.24", only: :dev, runtime: false},
       {:jason, "~> 1.2"},
       {:ex_sha3, "~> 0.1.1"},
-      {:libsecp256k1, "~> 0.1.10"},
+      {:ex_secp256k1, "~> 0.5"},
       {:tesla, "~> 1.4"},
       {:hackney, "~> 1.17"}
     ]

@@ -7,13 +7,13 @@ defmodule ETH.Utils do
   def get_private_key, do: :crypto.strong_rand_bytes(32)
 
   def get_public_key(<<private_key::binary-size(32)>>) do
-    {:ok, public_key} = :libsecp256k1.ec_pubkey_create(private_key, :uncompressed)
+    {:ok, public_key} = ExSecp256k1.create_public_key(private_key)
     public_key
   end
 
   def get_public_key(<<encoded_private_key::binary-size(64)>>) do
     private_key = Base.decode16!(encoded_private_key, case: :mixed)
-    {:ok, public_key} = :libsecp256k1.ec_pubkey_create(private_key, :uncompressed)
+    {:ok, public_key} = ExSecp256k1.create_public_key(private_key)
     public_key
   end
 
@@ -64,15 +64,13 @@ defmodule ETH.Utils do
   end
 
   def secp256k1_signature(hash, private_key) do
-    {:ok, signature, recovery} =
-      :libsecp256k1.ecdsa_sign_compact(hash, private_key, :default, <<>>)
+    {:ok, {signature, recovery}} = ExSecp256k1.sign_compact(hash, private_key)
 
     [signature: signature, recovery: recovery]
   end
 
   def secp256k1_recover_compact(hash, signature, recovery_id) do
-    {:ok, pubkey} =
-      :libsecp256k1.ecdsa_recover_compact(hash, signature, :uncompressed, recovery_id)
+    {:ok, pubkey} = ExSecp256k1.recover_compact(hash, signature, recovery_id)
 
     pubkey
   end
