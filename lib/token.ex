@@ -66,7 +66,6 @@ defmodule Magic.Token do
       :ok
     rescue
       e in DIDTokenError -> {:error, {:did_token_error, e.message}}
-
     end
   end
 
