@@ -55,6 +55,22 @@ defmodule Magic.Token do
   end
 
   @doc """
+    Validates did_token
+    
+    Returns :ok or an error tuple
+  """
+  @spec validate(did_token) :: :ok | {:error, {:did_token_error, String.t()}}
+  def validate(did_token) do
+    try do
+      validate!(did_token)
+      :ok
+    rescue
+      e in DIDTokenError -> {:error, {:did_token_error, e.message}}
+
+    end
+  end
+
+  @doc """
     Decodes a DID Token from a Base64 string into a tuple of its individual
     components: proof and claim. This method allows you decode the DID Token
     and inspect the token
@@ -83,13 +99,13 @@ defmodule Magic.Token do
   """
   @spec decode(did_token) ::
           {:ok, %{proof: String.t(), claim: claim, message: String.t()}}
-          | {:error, :malformed_did_token}
+          | {:error, {:did_token_error, String.t()}}
   def decode(did_token) do
     try do
       decoded = decode!(did_token)
       {:ok, decoded}
     rescue
-      DIDTokenError -> {:error, :malformed_did_token}
+      e in DIDTokenError -> {:error, {:did_token_error, e.message}}
     end
   end
 
