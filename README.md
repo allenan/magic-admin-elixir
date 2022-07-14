@@ -35,6 +35,14 @@ config :magic_admin, secret_key: "sk_live_XXXXXXXXXXX"
 
 #### Validate Tokens
 
+The `Token.validate/1` function returns `:ok` if the token is valid, or an error tuple
+with a message describing why the token is invalid.
+
+```elixir
+:ok = Magic.Token.validate(did_token)
+{:error, {:did_token_error, message}} = Magic.Token.validate(invalid_did_token)
+```
+
 The `Token.validate!/1` function returns `true` if the token is valid, or raises a
 `DIDTokenError` with a message describing why the token is invalid.
 
@@ -44,10 +52,18 @@ true = Magic.Token.validate!(did_token)
 
 #### Decode Tokens
 
-The `Token.decode!/1` function returns a map of `proof`, `claim` and `message`, or raises
-a `DIDTokenError` if it is malformed. `claim` is the parsed map of claims made by the decoded
+The `Token.decode/1` function returns a map of `proof`, `claim` and `message`, or an error
+tuple if it is malformed. `claim` is the parsed map of claims made by the decoded
 token. `proof` is the secp256k1 signature over a hash of `message` which is the JSON
 encoded version of `claim`.
+
+```elixir
+{:ok, %{proof: proof, claim: claim, message: message}} = Magic.Token.decode(did_token)
+{:error, {:did_token_error, message}} = Magic.Token.decode(invalid_did_token)
+```
+
+The `Token.decode!/1` function returns a map of `proof`, `claim` and `message`, or raises
+a `DIDTokenError` if it is malformed.
 
 ```elixir
 %{proof: proof, claim: claim, message: message} = Magic.Token.decode!(did_token)
