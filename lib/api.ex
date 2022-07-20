@@ -2,10 +2,13 @@ defmodule Magic.API do
   @moduledoc false
 
   use Tesla
-  @secret_key Application.get_env(:magic_admin, :secret_key)
 
   plug(Tesla.Middleware.BaseUrl, "https://api.magic.link")
-  plug(Tesla.Middleware.Headers, [{"X-Magic-Secret-Key", @secret_key}])
+
+  plug(Tesla.Middleware.Headers, [
+    {"X-Magic-Secret-Key", Application.get_env(:magic_admin, :secret_key)}
+  ])
+
   plug(Tesla.Middleware.JSON)
 
   def get_user(issuer) do
