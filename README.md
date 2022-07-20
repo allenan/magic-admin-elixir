@@ -12,7 +12,7 @@ The package can be installed by adding `magic_admin` to your list of dependencie
 ```elixir
 def deps do
   [
-    {:magic_admin, "~> 0.7.0"}
+    {:magic_admin, "~> 0.8.0"}
   ]
 end
 ```
