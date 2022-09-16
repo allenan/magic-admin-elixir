@@ -4,22 +4,20 @@ defmodule Magic.API do
   use Tesla
 
   def get_user(issuer, opts \\ []) do
-    secret_key = Keyword.get(opts, :secret_key, Application.get_env(:magic_admin, :secret_key))
-
-    client(secret_key)
+    client(opts)
     |> get("/v1/admin/auth/user/get", query: [issuer: issuer])
     |> process_response()
   end
 
   def logout_user(issuer, opts \\ []) do
-    secret_key = Keyword.get(opts, :secret_key, Application.get_env(:magic_admin, :secret_key))
-
-    client(secret_key)
+    client(opts)
     |> post("/v2/admin/auth/user/logout", %{issuer: issuer})
     |> process_response()
   end
 
-  defp client(secret_key) do
+  defp client(opts \\ []) do
+    secret_key = Keyword.get(opts, :secret_key, Application.get_env(:magic_admin, :secret_key))
+
     middleware = [
       {Tesla.Middleware.BaseUrl, "https://api.magic.link"},
       Tesla.Middleware.JSON,
