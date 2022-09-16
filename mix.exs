@@ -31,7 +31,8 @@ defmodule Magic.MixProject do
       {:ex_sha3, "~> 0.1.1"},
       {:ex_secp256k1, "~> 0.5"},
       {:tesla, "~> 1.4"},
-      {:hackney, "~> 1.17"}
+      {:hackney, "~> 1.17"},
+      {:mox, "~> 1.0", only: :test}
     ]
   end
 
