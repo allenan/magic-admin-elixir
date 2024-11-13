@@ -15,12 +15,22 @@ defmodule ApiTest do
     }
   end
 
+  def user_with_wallet_fixture(wallet_type) do
+    user_fixture()
+    |> Map.put("wallets", [
+      %{
+        "wallet_type" => wallet_type |> to_string() |> String.upcase(),
+        "public_address" => "public_address"
+      }
+    ])
+  end
+
   describe "get_user/2" do
-    test "gets user by issuer" do
+    test "gets user by issuer with no wallet type" do
       Mox.expect(Tesla.MockAdapter, :call, fn env, _opts ->
         assert env.url == "https://api.magic.link/v1/admin/auth/user/get"
         assert env.headers == [{"X-Magic-Secret-Key", "some_api_key"}]
-        assert env.query == [issuer: "some_issuer"]
+        assert env.query == [issuer: "some_issuer", wallet_type: "NONE"]
         {:ok, %{env | body: %{"status" => "ok", "data" => user_fixture()}}}
       end)
 
@@ -29,15 +39,38 @@ defmodule ApiTest do
       assert user.email == "some@email.com"
     end
 
+    test "gets user by issuer with wallet type" do
+      Mox.expect(Tesla.MockAdapter, :call, fn env, _opts ->
+        assert env.url == "https://api.magic.link/v1/admin/auth/user/get"
+        assert env.headers == [{"X-Magic-Secret-Key", "some_api_key"}]
+        assert env.query == [issuer: "some_issuer", wallet_type: "SOLANA"]
+
+        {:ok,
+         %{
+           env
+           | body: %{
+               "status" => "ok",
+               "data" => user_with_wallet_fixture(:solana)
+             }
+         }}
+      end)
+
+      {status, user} = API.get_user("some_issuer", :solana)
+      assert status == :ok
+      assert user.email == "some@email.com"
+      assert length(user.wallets) == 1
+      assert Enum.at(user.wallets, 0) |> Map.get(:wallet_type) == :solana
+    end
+
     test "gets user by issuer with a different secret key" do
       Mox.expect(Tesla.MockAdapter, :call, fn env, _opts ->
         assert env.url == "https://api.magic.link/v1/admin/auth/user/get"
         assert env.headers == [{"X-Magic-Secret-Key", "different_api_key"}]
-        assert env.query == [issuer: "some_issuer"]
+        assert env.query == [issuer: "some_issuer", wallet_type: "NONE"]
         {:ok, %{env | body: %{"status" => "ok", "data" => user_fixture()}}}
       end)
 
-      {status, user} = API.get_user("some_issuer", secret_key: "different_api_key")
+      {status, user} = API.get_user("some_issuer", :none, secret_key: "different_api_key")
       assert status == :ok
       assert user.email == "some@email.com"
     end

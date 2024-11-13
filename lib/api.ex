@@ -3,9 +3,11 @@ defmodule Magic.API do
 
   use Tesla
 
-  def get_user(issuer, opts \\ []) do
+  def get_user(issuer, wallet_type \\ :none, opts \\ []) do
     client(opts)
-    |> get("/v1/admin/auth/user/get", query: [issuer: issuer])
+    |> get("/v1/admin/auth/user/get",
+      query: [issuer: issuer, wallet_type: wallet_type |> to_string() |> String.upcase()]
+    )
     |> process_response()
   end
 
@@ -15,7 +17,7 @@ defmodule Magic.API do
     |> process_response()
   end
 
-  defp client(opts \\ []) do
+  defp client(opts) do
     secret_key = Keyword.get(opts, :secret_key, Application.get_env(:magic_admin, :secret_key))
 
     middleware = [
@@ -43,6 +45,17 @@ defmodule Magic.API do
   end
 
   defp map_keys_to_atoms(map) do
-    map |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    map
+    |> Map.new(fn {rk, rv} ->
+      v =
+        cond do
+          rk == "wallet_type" -> rv |> String.downcase() |> String.to_atom()
+          is_map(rv) -> map_keys_to_atoms(rv)
+          is_list(rv) -> Enum.map(rv, &map_keys_to_atoms/1)
+          true -> rv
+        end
+
+      {String.to_atom(rk), v}
+    end)
   end
 end

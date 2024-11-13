@@ -4,35 +4,37 @@ defmodule Magic.User do
   """
   alias Magic.Token
 
-  @type issuer :: Token.issuer()
-  @type public_address :: Token.public_address()
   @type did_token :: Token.did_token()
+  @type wallet_type :: Token.wallet_type()
+  @type public_address :: Token.public_address()
+  @type issuer :: Token.issuer()
   @type user :: %{email: String.t(), issuer: issuer, public_address: public_address}
 
   @doc """
   Retrieves information about the user by the supplied issuer
   """
-  @spec get_metadata_by_issuer(issuer) :: {:ok, user} | {:error, String.t()}
-  def get_metadata_by_issuer(issuer, opts \\ []) do
-    Magic.API.get_user(issuer, opts)
+  @spec get_metadata_by_issuer(issuer, wallet_type) :: {:ok, user} | {:error, String.t()}
+  def get_metadata_by_issuer(issuer, wallet_type \\ :none, opts \\ []) do
+    Magic.API.get_user(issuer, wallet_type, opts)
   end
 
   @doc """
   Retrieves information about the user by the supplied public address
   """
-  @spec get_metadata_by_public_address(public_address) :: {:ok, user} | {:error, String.t()}
-  def get_metadata_by_public_address(public_address, opts \\ []) do
+  @spec get_metadata_by_public_address(public_address, wallet_type) ::
+          {:ok, user} | {:error, String.t()}
+  def get_metadata_by_public_address(public_address, wallet_type \\ :none, opts \\ []) do
     issuer = Token.construct_issuer_with_public_address(public_address)
-    get_metadata_by_issuer(issuer, opts)
+    get_metadata_by_issuer(issuer, wallet_type, opts)
   end
 
   @doc """
   Retrieves information about the user by the supplied DID Token
   """
-  @spec get_metadata_by_token(did_token) :: {:ok, user} | {:error, String.t()}
-  def get_metadata_by_token(did_token, opts \\ []) do
+  @spec get_metadata_by_token(did_token, wallet_type) :: {:ok, user} | {:error, String.t()}
+  def get_metadata_by_token(did_token, wallet_type \\ :none, opts \\ []) do
     issuer = Token.get_issuer(did_token)
-    get_metadata_by_issuer(issuer, opts)
+    get_metadata_by_issuer(issuer, wallet_type, opts)
   end
 
   @doc """

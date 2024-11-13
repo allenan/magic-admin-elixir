@@ -24,6 +24,33 @@ defmodule Magic.Token do
         }
 
   @typedoc """
+  Type of the crypto wallet of the Magic User
+  """
+  @type wallet_type ::
+          :eth
+          | :harmony
+          | :icon
+          | :flow
+          | :tezos
+          | :zilliqa
+          | :polkadot
+          | :solana
+          | :avax
+          | :algod
+          | :cosmos
+          | :celo
+          | :bitcoin
+          | :near
+          | :helium
+          | :conflux
+          | :terra
+          | :taquito
+          | :ed
+          | :hedera
+          | :none
+          | :any
+
+  @typedoc """
   Cryptographic public address of the Magic User.
   """
   @type public_address :: String.t()
@@ -38,7 +65,7 @@ defmodule Magic.Token do
 
   @doc """
     Validates did_token
-    
+
     Returns true or raises an error
   """
   @spec validate!(did_token) :: true
@@ -56,7 +83,7 @@ defmodule Magic.Token do
 
   @doc """
     Validates did_token
-    
+
     Returns :ok or an error tuple
   """
   @spec validate(did_token) :: :ok | {:error, {:did_token_error, String.t()}}
@@ -73,7 +100,7 @@ defmodule Magic.Token do
     Decodes a DID Token from a Base64 string into a tuple of its individual
     components: proof and claim. This method allows you decode the DID Token
     and inspect the token
-    
+
     Returns A map containing proof, claim and message or raise an error
   """
   @spec decode!(did_token) :: %{proof: String.t(), claim: claim, message: String.t()}
@@ -93,7 +120,7 @@ defmodule Magic.Token do
     Decodes a DID Token from a Base64 string into a tuple of its individual
     components: proof and claim. This method allows you decode the DID Token
     and inspect the token
-    
+
     Returns an :ok tuple with a map containing proof, claim and message or an error tuple
   """
   @spec decode(did_token) ::
@@ -110,7 +137,7 @@ defmodule Magic.Token do
 
   @doc """
     Parses public_address and extracts issuer
-    
+
     Returns issuer info
   """
   @spec construct_issuer_with_public_address(public_address) :: issuer
@@ -120,7 +147,7 @@ defmodule Magic.Token do
 
   @doc """
     Parses did_token and extracts issuer
-    
+
     Returns issuer info
   """
   @spec get_issuer(did_token) :: issuer
@@ -131,7 +158,7 @@ defmodule Magic.Token do
 
   @doc """
     Parses did_token and extracts cryptographic public_address
-    
+
     Returns cryptographic public address of the Magic User who generated the supplied DID Token.
   """
   @spec get_public_address(did_token) :: public_address
