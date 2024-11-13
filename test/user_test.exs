@@ -16,8 +16,18 @@ defmodule UserTest do
     }
   end
 
+  def user_with_wallet_fixture(wallet_type) do
+    user_fixture()
+    |> Map.put("wallets", [
+      %{
+        "wallet_type" => wallet_type |> to_string() |> String.upcase(),
+        "public_address" => "public_address"
+      }
+    ])
+  end
+
   describe "get_metadata_by_issuer/2" do
-    test "gets user given issuer" do
+    test "gets user given issuer with no wallet type" do
       Mox.expect(Tesla.MockAdapter, :call, fn env, _opts ->
         assert env.headers == [{"X-Magic-Secret-Key", "some_api_key"}]
         {:ok, %{env | body: %{"status" => "ok", "data" => user_fixture()}}}
@@ -28,20 +38,35 @@ defmodule UserTest do
       assert user.email == "some@email.com"
     end
 
+    test "gets user given issuer with wallet type" do
+      Mox.expect(Tesla.MockAdapter, :call, fn env, _opts ->
+        assert env.headers == [{"X-Magic-Secret-Key", "some_api_key"}]
+        {:ok, %{env | body: %{"status" => "ok", "data" => user_with_wallet_fixture(:solana)}}}
+      end)
+
+      {status, user} = User.get_metadata_by_issuer("some_issuer", :solana)
+      assert status == :ok
+      assert user.email == "some@email.com"
+      assert length(user.wallets) == 1
+      assert Enum.at(user.wallets, 0) |> Map.get(:wallet_type) == :solana
+    end
+
     test "gets user given issuer with different secret key" do
       Mox.expect(Tesla.MockAdapter, :call, fn env, _opts ->
         assert env.headers == [{"X-Magic-Secret-Key", "different_api_key"}]
         {:ok, %{env | body: %{"status" => "ok", "data" => user_fixture()}}}
       end)
 
-      {status, user} = User.get_metadata_by_issuer("some_issuer", secret_key: "different_api_key")
+      {status, user} =
+        User.get_metadata_by_issuer("some_issuer", :none, secret_key: "different_api_key")
+
       assert status == :ok
       assert user.email == "some@email.com"
     end
   end
 
   describe "get_metadata_by_public_address/2" do
-    test "gets user given public address" do
+    test "gets user given public address with no wallet type" do
       Mox.expect(Tesla.MockAdapter, :call, fn env, _opts ->
         assert env.headers == [{"X-Magic-Secret-Key", "some_api_key"}]
         {:ok, %{env | body: %{"status" => "ok", "data" => user_fixture()}}}
@@ -52,6 +77,19 @@ defmodule UserTest do
       assert user.email == "some@email.com"
     end
 
+    test "gets user given public address with wallet type" do
+      Mox.expect(Tesla.MockAdapter, :call, fn env, _opts ->
+        assert env.headers == [{"X-Magic-Secret-Key", "some_api_key"}]
+        {:ok, %{env | body: %{"status" => "ok", "data" => user_with_wallet_fixture(:solana)}}}
+      end)
+
+      {status, user} = User.get_metadata_by_public_address("some_public_address", :solana)
+      assert status == :ok
+      assert user.email == "some@email.com"
+      assert length(user.wallets) == 1
+      assert Enum.at(user.wallets, 0) |> Map.get(:wallet_type) == :solana
+    end
+
     test "gets user given public address with different secret key" do
       Mox.expect(Tesla.MockAdapter, :call, fn env, _opts ->
         assert env.headers == [{"X-Magic-Secret-Key", "different_api_key"}]
@@ -59,7 +97,9 @@ defmodule UserTest do
       end)
 
       {status, user} =
-        User.get_metadata_by_public_address("some_public_address", secret_key: "different_api_key")
+        User.get_metadata_by_public_address("some_public_address", :none,
+          secret_key: "different_api_key"
+        )
 
       assert status == :ok
       assert user.email == "some@email.com"
@@ -67,7 +107,7 @@ defmodule UserTest do
   end
 
   describe "get_metadata_by_token/2" do
-    test "gets user given token" do
+    test "gets user given token with no wallet type" do
       Mox.expect(Tesla.MockAdapter, :call, fn env, _opts ->
         assert env.headers == [{"X-Magic-Secret-Key", "some_api_key"}]
         {:ok, %{env | body: %{"status" => "ok", "data" => user_fixture()}}}
@@ -79,6 +119,20 @@ defmodule UserTest do
       assert user.email == "some@email.com"
     end
 
+    test "gets user given token with wallet type" do
+      Mox.expect(Tesla.MockAdapter, :call, fn env, _opts ->
+        assert env.headers == [{"X-Magic-Secret-Key", "some_api_key"}]
+        {:ok, %{env | body: %{"status" => "ok", "data" => user_with_wallet_fixture(:solana)}}}
+      end)
+
+      %{token: did_token} = token_fixture()
+      {status, user} = User.get_metadata_by_token(did_token, :solana)
+      assert status == :ok
+      assert user.email == "some@email.com"
+      assert length(user.wallets) == 1
+      assert Enum.at(user.wallets, 0) |> Map.get(:wallet_type) == :solana
+    end
+
     test "gets user given token with different secret key" do
       Mox.expect(Tesla.MockAdapter, :call, fn env, _opts ->
         assert env.headers == [{"X-Magic-Secret-Key", "different_api_key"}]
@@ -86,7 +140,10 @@ defmodule UserTest do
       end)
 
       %{token: did_token} = token_fixture()
-      {status, user} = User.get_metadata_by_token(did_token, secret_key: "different_api_key")
+
+      {status, user} =
+        User.get_metadata_by_token(did_token, :none, secret_key: "different_api_key")
+
       assert status == :ok
       assert user.email == "some@email.com"
     end
@@ -157,6 +214,7 @@ defmodule UserTest do
       end)
 
       %{token: did_token} = token_fixture()
+
       assert User.logout_by_token(did_token, secret_key: "different_api_key") ==
                {:ok, %{}}
     end
