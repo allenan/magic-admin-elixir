@@ -35,7 +35,7 @@ defmodule Magic.Utils do
 
   def remove_hex_prefix(s) do
     if String.starts_with?(s, "0x") do
-      String.slice(s, 2..-1)
+      String.slice(s, 2..-1//1)
     else
       s
     end
